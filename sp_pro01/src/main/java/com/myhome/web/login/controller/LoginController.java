@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -28,6 +29,14 @@ public class LoginController {
 	@Autowired
 	private DeptService deptService;
 	
+	@GetMapping(value="/login")
+	public String login(Model model) {
+		logger.info("login()");
+		List<DeptDTO> deptDatas = deptService.getAll();
+		model.addAttribute("deptDatas", deptDatas);
+		return "login/login";
+	}
+	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public String login(LoginVO loginVo, HttpSession session, Model model) {
 		logger.info("login({}, {}, {})", loginVo.getEmpId(), loginVo.getDeptId(), loginVo.getEmpName());
@@ -39,9 +48,7 @@ public class LoginController {
 			return "redirect:/";
 		} else {
 			// 로그인 실패
-			List<DeptDTO> deptDatas = deptService.getAll();
-			model.addAttribute("deptDatas", deptDatas);
-			return "login/login";
+			return login(model);
 		}
 	}
 }

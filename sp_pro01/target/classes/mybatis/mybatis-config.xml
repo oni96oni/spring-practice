@@ -8,13 +8,13 @@
 	<typeAliases>
 		<typeAlias type="com.myhome.web.dept.model.DeptDTO" alias="deptDto" />
 		<typeAlias type="com.myhome.web.emp.model.EmpDTO" alias="empDto" />
+		<typeAlias type="com.myhome.web.board.model.BoardDTO" alias="boardDto" />
+		<typeAlias type="com.myhome.web.board.model.BoardStaticsDTO" alias="boardStaticsDto" />
+		<typeAlias type="com.myhome.web.emp.model.EmpDetailDTO" alias="empDetailDto" />
 		<!--
 		<typeAlias type="login.model.PermDTO" alias="permDto" />
 		<typeAlias type="job.model.JobDTO" alias="jobDto" />
 		<typeAlias type="locs.model.LocsDTO" alias="locsDto" />
-		<typeAlias type="emps.model.EmpsDetailDTO" alias="empsDetailDto" />
-		<typeAlias type="board.model.EmpBoardDTO" alias="empBoardDto" />
-		<typeAlias type="board.model.EmpBoardStaticsDTO" alias="empBoardStaticsDto" />
 		<typeAlias type="comment.model.CommentDTO" alias="commentDto" />
 		 -->
 	</typeAliases>
