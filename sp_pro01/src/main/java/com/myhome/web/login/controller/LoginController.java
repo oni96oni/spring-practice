@@ -51,11 +51,11 @@ public class LoginController {
 			return login(model);
 		}
 	}
+	
+	@RequestMapping(value="/logout", method=RequestMethod.GET)
+	public String logout(HttpSession session) {
+		// session.invalidate();
+		session.removeAttribute("loginData");
+		return "redirect:/";
+	}
 }
-
-	/*
-	 * 1. HttpServletRequest
-	 * 2. 파라메터명과 동일한 매개변수명을 사용
-	 * 3. 파라메터명과 동일한 멤버변수를 가지는 객체를 사용
-	 * 
-	 */

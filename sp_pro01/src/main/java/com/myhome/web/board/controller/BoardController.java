@@ -4,6 +4,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.myhome.web.board.model.BoardDTO;
@@ -81,12 +83,14 @@ public class BoardController {
 	}
 	
 	@GetMapping("/detail")
-	public String getDetail(Model model, @RequestParam int id) {
+	public String getDetail(HttpSession session, Model model, @RequestParam int id) {
 		logger.info("getDetail(id={})", id);
 		
 		BoardDTO data = service.getData(id);
 		
+		
 		if(data != null) {
+			service.incViewCnt(session, data);
 			model.addAttribute("data", data);
 			return "board/detail";
 		} else {
@@ -94,6 +98,29 @@ public class BoardController {
 			return "error/notExists";
 		}
 	}
+	
+	@PostMapping(value="/like" , produces="application/json; charset=utf-8")
+	@ResponseBody
+	public String getLike(HttpSession session, @SessionAttribute("loginData") EmpDTO empDto,
+			@RequestParam int id) {
+		logger.info("getLike(empDto={}, id={})", empDto, id);
+		
+		BoardDTO data = service.getData(id);
+		
+		JSONObject json = new JSONObject();
+		
+		if(data != null) {
+			service.incLike(session, data);
+			json.put("like", data.getLike());
+			json.put("code", "success");
+		} else {
+			json.put("code", "noData");
+			json.put("message", "해당 데이터가 존재하지 않습니다.");
+		}
+		
+		return json.toJSONString();
+	}
+	
 	
 	@GetMapping(value="/modify")
 	public String modify(Model model
@@ -132,7 +159,7 @@ public class BoardController {
 				if(result) {
 					return "redirect:/board/detail?id=" + data.getId();
 				} else {
-					return "board/modify";
+					return modify(model, empDto, boardVo.getId());
 				}
 			} else {
 				model.addAttribute("error", "해당 작업을 수행할 권한이 없습니다.");
@@ -143,4 +170,42 @@ public class BoardController {
 			return "error/noExists";
 		}
 	}
+	
+	@PostMapping(value="/delete", produces="application/json; charset=utf-8")
+	@ResponseBody // 원래는 return에 들어가는 정보가 jsp인데 이걸 적어야 body부로 들어간다.
+	public String delete(@SessionAttribute("loginData") EmpDTO empDto,
+			@RequestParam int id) {
+		logger.info("delete(empDto={}, id={})", empDto, id);
+		
+		BoardDTO data = service.getData(id);
+		
+		JSONObject json = new JSONObject();
+		
+		if(data == null) {
+			// 삭제할 데이터 없음
+			json.put("code", "notExists");
+			json.put("message", "이미 삭제된 데이터 입니다.");
+		} else {
+			if(data.getEmpId() == empDto.getEmpId()) {
+				// 글의 직원 아이디와 삭제하려는 사람의 직원 아이디 동일 하니까 삭제
+				boolean result = service.remove(data);
+				if(result) {
+					// 삭제 완료
+					json.put("code", "success");
+					json.put("message", "삭제가 완료되었습니다.");
+				} else {
+					// 삭제 실패
+					json.put("code", "fail");
+					json.put("message", "삭제에 실패 하였습니다.");
+				}
+			} else {
+				// 동일하지 않으므로 삭제 x - 권한이 없다.
+				json.put("code", "permissionError");
+				json.put("message", "삭제할 권한이 없습니다.");
+			}
+		}
+		
+		return json.toJSONString();
+	}
+	
 }

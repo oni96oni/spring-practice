@@ -10,20 +10,6 @@
 	<title>${data.title}</title>
 	<%@ include file="../module/head.jsp" %>
 </head>
-<script type="text/javascript">
-	function ajaxLike(element, id) {
-		$.ajax({
-			type: "post",
-			url: "/ajax/board/like",
-			data: {
-				id: id
-			},
-			success: function(data) {
-				element.innerText = data.like;
-			}
-		});
-	}
-</script>
 <body>
 	<header></header>
 	<section class="container">
@@ -59,22 +45,22 @@
 		<nav>
 			<div>
 				<ul class="pagination justify-content-center">
-					<c:url var="boardUrl" value="/board/detail">
+					<c:url var="boardDetailUrl" value="/board/detail">
 						<c:param name="id">${data.id}</c:param>
 					</c:url>
 					<c:if test="${commentPage.hasPrevPage()}">
 						<li class="page-item">
-							<a class="page-link" href="${boardUrl}&page=${commentPage.prevPageNumber}">Prev</a>
+							<a class="page-link" href="${boardDetailUrl}&page=${commentPage.prevPageNumber}">Prev</a>
 						</li>
 					</c:if>
 					<c:forEach items="${commentPage.getPageNumberList(commentPage.currentPageNumber - 2, commentPage.currentPageNumber + 2)}" var="num">
 						<li class="page-item ${commentPage.currentPageNumber eq num ? 'active' : ''}">
-							<a class="page-link" href="${boardUrl}&page=${num}">${num}</a>
+							<a class="page-link" href="${boardDetailUrl}&page=${num}">${num}</a>
 						</li>
 					</c:forEach>
 					<c:if test="${commentPage.hasNextPage()}">
 						<li class="page-item">
-							<a class="page-link" href="${boardUrl}&page=${commentPage.nextPageNumber}">Next</a>
+							<a class="page-link" href="${boardDetailUrl}&page=${commentPage.nextPageNumber}">Next</a>
 						</li>
 					</c:if>
 				</ul>
@@ -115,7 +101,7 @@
 				</div>
 			</c:forEach>
 			<div class="mb-1">
-				<form action="/comment/add" method="post">
+				<form action="${boardUrl}/comment/add" method="post">
 					<input type="hidden" name="bid" value="${data.id}">
 					<div class="input-group">
 						<textarea class="form-control" name="content" rows="2"></textarea>
@@ -216,7 +202,7 @@
 		}
 		function deleteBoard(boardId) {
 			$.ajax({
-				url: "/board/delete",
+				url: "${boardUrl}/delete",
 				type: "post",
 				data: {
 					id: boardId
@@ -225,12 +211,29 @@
 				success: function(data) {
 					if(data.code === "success") {
 						alert("삭제 완료");
-						location.href = "/board";
+						location.href = "${boardUrl}";
 					} else if(data.code === "permissionError") {
 						alert("권한이 오류");
 					} else if(data.code === "notExists") {
 						alert("이미 삭제되었습니다.")
 					}
+				}
+			});
+		}
+		function ajaxLike(element, id) {
+			$.ajax({
+				type: "post",
+				url: "${boardUrl}/like",
+				data: {
+					id: id
+				},
+				success: function(data) {
+					if(data.code === "success") {
+						element.innerText = data.like;
+					} else if (data.code === "noData") {
+						alert(data.message);
+						location.href="${boardUrl}";
+					} 
 				}
 			});
 		}
