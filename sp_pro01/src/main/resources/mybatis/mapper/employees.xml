@@ -17,7 +17,7 @@
 		  FROM JOBS
 		 WHERE JOB_ID = #{id}
 	</select>
-	<select id="selectId" resultType="empsDto">
+	<select id="selectId" resultType="empDto">
 		SELECT E.EMPLOYEE_ID AS empId
 		     , CONCAT(FIRST_NAME, ' ' || LAST_NAME) AS empName
 		     , CONCAT(E.EMAIL, '@emp.com') AS email
@@ -32,7 +32,7 @@
 		    ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 		 WHERE E.EMPLOYEE_ID = #{id}
 	</select>
-	<insert id="insertEmp" parameterType="empsDto">
+	<insert id="insertEmp" parameterType="empDto">
 		INSERT INTO 
 		  EMPLOYEES(EMPLOYEE_ID
 		          , FIRST_NAME
@@ -49,7 +49,7 @@
 		          , #{deptId}
 		          , SYSDATE)
 	</insert>
-	<select id="selectAll" resultType="empsDto">
+	<select id="selectAll" resultType="empDto">
 		SELECT E.EMPLOYEE_ID AS empId
 		     , CONCAT(FIRST_NAME, ' ' || LAST_NAME) AS empName
 		     , CONCAT(E.EMAIL, '@emp.com') AS email
@@ -63,7 +63,7 @@
 		  JOIN DEPARTMENTS D
 		    ON E.DEPARTMENT_ID = D.DEPARTMENT_ID
 	</select>
-	<select id="selectPage" parameterType="map" resultType="empsDto">
+	<select id="selectPage" parameterType="map" resultType="empDto">
 		SELECT RN
 		     , empId
 		     , empName
@@ -102,7 +102,7 @@
 			WHERE E.DEPARTMENT_ID = #{id}
 		</if>
 	</select>
-	<select id="selectEmpDetail" parameterType="_int" resultType="empsDetailDto">
+	<select id="selectEmpDetail" parameterType="_int" resultType="empDetailDto">
 		SELECT EMPLOYEE_ID AS empId
 		     , HIRE_DATE AS hireDate
 		     , PHONE_NUMBER AS phone
@@ -111,7 +111,7 @@
 		  FROM EMPLOYEES
 		 WHERE EMPLOYEE_ID = #{id}
 	</select>
-	<update id="updateEmp" parameterType="empsDto">
+	<update id="updateEmp" parameterType="empDto">
 		UPDATE EMPLOYEES
 		   SET EMAIL = SUBSTR(#{email}, 1, INSTR(#{email}, '@emp.com') - 1)
 		     , FIRST_NAME = SUBSTR(#{empName}, 1, INSTR(#{empName}, ' ') - 1)
@@ -120,7 +120,7 @@
 		     , DEPARTMENT_ID = #{deptId}
 		 WHERE EMPLOYEE_ID = #{empId}
 	</update>
-	<update id="updateEmpDetail" parameterType="empsDetailDto">
+	<update id="updateEmpDetail" parameterType="empDetailDto">
 		UPDATE EMPLOYEES
 		   SET PHONE_NUMBER = #{phone}
 		     , SALARY = #{salary}

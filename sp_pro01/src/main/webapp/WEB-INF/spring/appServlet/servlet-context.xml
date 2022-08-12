@@ -32,14 +32,17 @@
 		<beans:property name="username" value="puser1"></beans:property>
 		<beans:property name="password" value="puser1"></beans:property>
 	</beans:bean>
+	
 	<beans:bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
 		<beans:property name="dataSource" ref="dataSource"></beans:property>
 	</beans:bean>
+	
 	<beans:bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		<beans:property name="dataSource" ref="dataSource"></beans:property>
 		<beans:property name="configLocation" value="classpath:/mybatis/mybatis-config.xml"></beans:property>
 		<beans:property name="mapperLocations" value="classpath:/mybatis/mapper/*.xml"></beans:property>
 	</beans:bean>
+	
 	<beans:bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
 		<beans:constructor-arg index="0" ref="sqlSessionFactory"></beans:constructor-arg>
 	</beans:bean>
@@ -48,4 +51,6 @@
 		<beans:property name="dataSource" ref="dataSource"></beans:property>
 	</beans:bean>
 	<tx:annotation-driven transaction-manager="transactionManager" />
+	
+	<beans:bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver"></beans:bean>
 </beans:beans>

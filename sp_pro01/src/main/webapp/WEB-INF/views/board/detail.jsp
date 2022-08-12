@@ -101,7 +101,7 @@
 				</div>
 			</c:forEach>
 			<div class="mb-1">
-				<form action="${boardUrl}/comment/add" method="post">
+				<form action="${pageContext.request.contextPath}/comment/add" method="post">
 					<input type="hidden" name="bid" value="${data.id}">
 					<div class="input-group">
 						<textarea class="form-control" name="content" rows="2"></textarea>
@@ -145,6 +145,24 @@
 			element.setAttribute("onclick", "commentUpdate(this);");
 		}
 		
+		function commentUpdate(element) {
+			var cid = element.parentElement.parentElement.children[0].value;
+			var value = element.parentElement.previousElementSibling.children[0].value;
+			
+			$.ajax({
+				url: "${pageContext.request.contextPath}/comment/modify",
+				type: "post",
+				data: {
+					id: cid,
+					content: value
+				},
+				success: function(data) {
+					element.parentElement.previousElementSibling.children[0].value = data.value
+					changeText(element);
+				}
+			});
+		}
+		
 		function changeText(element) {
 			element.innerText = "수정";
 			var cid = element.parentElement.parentElement.children[0].value;
@@ -161,27 +179,9 @@
 			element.setAttribute("onclick", "changeEdit(this);");
 		}
 		
-		function commentUpdate(element) {
-			var cid = element.parentElement.parentElement.children[0].value;
-			var value = element.parentElement.previousElementSibling.children[0].value;
-			
-			$.ajax({
-				url: "/comment/modify",
-				type: "post",
-				data: {
-					id: cid,
-					content: value
-				},
-				success: function(data) {
-					element.parentElement.previousElementSibling.children[0].value = data.value
-					changeText(element);
-				}
-			});
-		}
-		
 		function commentDelete(element, id) {
 			$.ajax({
-				url: "/comment/delete",
+				url: "${pageContext.request.contextPath}/comment/delete",
 				type: "post",
 				data: {
 					id: id

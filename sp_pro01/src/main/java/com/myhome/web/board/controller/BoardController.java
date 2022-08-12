@@ -22,8 +22,11 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 import com.myhome.web.board.model.BoardDTO;
 import com.myhome.web.board.service.BoardService;
 import com.myhome.web.board.vo.BoardVO;
+import com.myhome.web.comment.model.CommentDTO;
+import com.myhome.web.comment.service.CommentService;
 import com.myhome.web.common.util.Paging;
 import com.myhome.web.emp.model.EmpDTO;
+import com.myhome.web.emp.service.EmpService;
 
 @Controller
 @RequestMapping(value = "/board")
@@ -33,6 +36,12 @@ public class BoardController {
 	
 	@Autowired
 	private BoardService service;
+	
+	@Autowired
+	private CommentService commentService;
+	
+	@Autowired
+	private EmpService empService;
 	
 	@RequestMapping(value="", method=RequestMethod.GET)
 	public String getList(Model model, HttpSession session
@@ -61,6 +70,7 @@ public class BoardController {
 	
 	@RequestMapping(value="/add", method=RequestMethod.GET)
 	public String add() {
+		logger.info("add()");
 		return "board/add";
 	}
 	
@@ -83,15 +93,24 @@ public class BoardController {
 	}
 	
 	@GetMapping("/detail")
-	public String getDetail(HttpSession session, Model model, @RequestParam int id) {
+	public String getDetail(HttpSession session, Model model, @RequestParam(value="id") int id, @RequestParam(value="page", defaultValue = "1") String page) {
 		logger.info("getDetail(id={})", id);
 		
 		BoardDTO data = service.getData(id);
-		
-		
+
 		if(data != null) {
 			service.incViewCnt(session, data);
+			EmpDTO empData = empService.getId("" + data.getEmpId());
+		
+			List commentDatas = commentService.getDatas(data.getId());
+		
+			page = page == null ? "1" : page;
+		
+			Paging commentPage = new Paging(commentDatas, Integer.parseInt(page), 5);
+		
 			model.addAttribute("data", data);
+			model.addAttribute("empData", empData);
+			model.addAttribute("commentPage", commentPage);
 			return "board/detail";
 		} else {
 			model.addAttribute("error", "해당 데이터가 존재하지 않습니다.");

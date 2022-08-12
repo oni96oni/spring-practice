@@ -21,10 +21,10 @@ import com.myhome.web.emp.model.EmpDTO;
 @Service
 public class BoardService {
 	
+	private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
+
 	@Autowired
 	private BoardDAO dao;
-	
-	private static final Logger logger = LoggerFactory.getLogger(BoardService.class);
 	
 	public List<BoardDTO> getAll() {
 		logger.info("getAll()");

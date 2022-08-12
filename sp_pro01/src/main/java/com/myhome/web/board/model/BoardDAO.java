@@ -13,12 +13,12 @@ import com.myhome.web.board.service.BoardService;
 @Repository
 public class BoardDAO {
 	
+	private static final Logger logger = LoggerFactory.getLogger(BoardDAO.class);
+	
 	@Autowired
 	private SqlSession session;
 	
 	private String mapper = "boardMapper.%s";
-	
-	private static final Logger logger = LoggerFactory.getLogger(BoardDAO.class);
 	
 	
 	public List<BoardDTO> selectAll() {
