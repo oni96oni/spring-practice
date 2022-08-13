@@ -9,9 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 import com.myhome.web.comment.model.CommentDTO;
@@ -41,6 +43,7 @@ public class CommentController {
 	}
 	
 	@PostMapping(value="/comment/modify", produces="application/json; charset=utf-8")
+	@ResponseBody
 	public void modifyComment(HttpServletResponse response, @SessionAttribute("loginData") EmpDTO empDto, @RequestParam int id, @RequestParam String content) throws IOException {
 		
 		CommentDTO commentData = service.getData(id);
@@ -63,7 +66,8 @@ public class CommentController {
 	}
 	
 	@PostMapping(value="/comment/delete", produces="application/json; charset=utf-8")
-	public void deleteComment(HttpServletResponse response, @SessionAttribute("loginData") EmpDTO empDto, @RequestParam int id, @RequestParam String content) throws IOException {
+	@ResponseBody
+	public void deleteComment(HttpServletResponse response, @SessionAttribute("loginData") EmpDTO empDto, @RequestParam int id) throws IOException {
 		CommentDTO commentData = service.getData(id);
 		
 		StringBuilder sb = new StringBuilder();
