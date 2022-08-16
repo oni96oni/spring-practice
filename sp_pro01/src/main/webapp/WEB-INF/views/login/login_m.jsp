@@ -5,6 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <c:url var="loginUrl" value="/login" />
 <form action="${loginUrl}" method="post">
+<input type="hidden" name="url" value="${param.url}">
 	<div class="form-floating mb-2">
 		<input class="form-control" type="text" id="id_empId" name="empId" value="" placeholder="직원ID">
 		<label for="id_empId">직원ID</label>

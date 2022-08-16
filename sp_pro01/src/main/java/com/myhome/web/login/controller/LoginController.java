@@ -2,6 +2,7 @@ package com.myhome.web.login.controller;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
@@ -38,14 +39,21 @@ public class LoginController {
 	}
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
-	public String login(LoginVO loginVo, HttpSession session, Model model) {
+	public String login(LoginVO loginVo, HttpServletRequest request ,String url, HttpSession session, Model model) {
 		logger.info("login({}, {}, {})", loginVo.getEmpId(), loginVo.getDeptId(), loginVo.getEmpName());
 		
 		boolean result = service.getLogin(session, loginVo);
 		
 		if(result) {
 			// 로그인 성공
-			return "redirect:/";
+			if(!url.isEmpty()) {
+				if(url.startsWith(request.getContextPath())) {
+					url = url.replace(request.getContextPath(), "");
+				}
+				return "redirect:" + url;
+			} else {
+				return "redirect:/";
+			}
 		} else {
 			// 로그인 실패
 			return login(model);

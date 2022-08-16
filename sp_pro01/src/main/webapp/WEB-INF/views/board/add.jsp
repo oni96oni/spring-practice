@@ -23,13 +23,41 @@
 		}
 		form.submit();
 	}
+	
+	function uploadCheck(element) {
+		var files = element.files;
+		
+		var modal = new bootstrap.Modal(document.getElementById("errorModal"), {
+			keyboard: false
+		});
+		var title = modal._element.querySelector(".modal-title");
+		var body = modal._element.querySelector(".modal-body");
+		
+		if(files.length > 3) {
+			title.innerText = "파일 업로드 오류";
+			body.innerText = "파일 업로드는 최대 3개로 제한되어 있습니다.";
+			modal.show();
+			element.value = "";
+			return;
+		}
+		
+		for(file of files) {
+			if(file.size / 1000 / 1000 > 5.0) {
+				title.innerText = "파일 업로드 오류";
+				body.innerText = "파일 하나당 최대 5MB 까지만 업로드 할 수 있다.";
+				modal.show();
+				element.value = "";
+				return;
+			}
+		}
+	}
 </script>
 <body>
 	<header></header>
 	<section class="container">
 		<div class="mt-3">
 			<c:url var="boardAddUrl" value="/board/add" />
-			<form action="${boardAddUrl}" method="post">
+			<form action="${boardAddUrl}" method="post" enctype="multipart/form-data">
 				<div class="mb-3">
 					<input class="form-control" type="text" name="title" placeholder="제목을 입력하세요.">
 				</div>
@@ -38,7 +66,7 @@
 						placeholder="내용을 입력하세요."></textarea>
 				</div>
 				<div>
-					<input class="form-control" type="file" name="fileUpload">
+					<input class="form-control" type="file" onchange="uploadCheck(this);" name="fileUpload" multiple>
 				</div>
 				<div class="mb-3 text-end">
 					<button class="btn btn-primary" type="button" onclick="formCheck(this.form);">저장</button>
@@ -71,5 +99,10 @@
 			filebrowserUploadUrl: "${upload}?type=image"
 		})
 	</script>
+	<c:if test="${not empty error}">
+		<script type="text/javascript">
+			alert("${error}");
+		</script>
+	</c:if>
 </body>
 </html>
