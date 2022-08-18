@@ -32,9 +32,9 @@ import com.myhome.web.upload.model.FileUploadDTO;
 import com.myhome.web.upload.service.FileUploadService;
 
 @Controller
-@RequestMapping(value = "/board")
+@RequestMapping(value="/board")
 public class BoardController {
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
 	
 	@Autowired
@@ -74,13 +74,44 @@ public class BoardController {
 		return "board/list";
 	}
 	
-	@RequestMapping(value="/add", method=RequestMethod.GET)
+	@GetMapping(value="/detail")
+	public String getDetail(Model model
+			, HttpSession session
+			, @RequestParam int id
+			, @RequestParam(value="page", defaultValue = "1") String page) {
+		logger.info("getDetail(id={})", id);
+		
+		BoardDTO data = service.getData(id);
+		List<FileUploadDTO> fileDatas = fileUploadService.getDatas(id);
+		
+		if(data != null) {
+			service.incViewCnt(session, data);
+			EmpDTO empData = empService.getId("" + data.getEmpId());
+			
+			List commentDatas = commentService.getDatas(data.getId());
+		
+			page = page == null ? "1" : page;
+		
+			Paging commentPage = new Paging(commentDatas, Integer.parseInt(page), 5);
+		
+			model.addAttribute("data", data);
+			model.addAttribute("empData", empData);
+			model.addAttribute("commentPage", commentPage);
+			model.addAttribute("fileDatas", fileDatas);
+			return "board/detail";
+		} else {
+			model.addAttribute("error", "해당 데이터가 존재하지 않습니다.");
+			return "error/notExists";
+		}
+	}
+	
+	@GetMapping(value="/add")
 	public String add() {
 		logger.info("add()");
 		return "board/add";
 	}
 	
-	@RequestMapping(value="/add", method=RequestMethod.POST)
+	@PostMapping(value="/add")
 	public String add(HttpServletRequest request
 			, @SessionAttribute("loginData") EmpDTO empDto
 			, @ModelAttribute BoardVO boardVo
@@ -94,11 +125,10 @@ public class BoardController {
 		
 		int id = service.add(data);
 		
-		for(MultipartFile file : files) {
-			FileUploadDTO fileData = new FileUploadDTO();
-			fileData.setBid(id);
-			fileData.setLocation(request.getServletContext().getRealPath("/resources"));
-			fileData.setUrl(request.getContextPath() + "/static/board/upload");
+		for(MultipartFile file: files) {
+			String location = request.getServletContext().getRealPath("/resources/board/upload");
+			String url = "/static/board/upload";
+			FileUploadDTO fileData = new FileUploadDTO(id, location, url);
 			
 			try {
 				int fileResult = fileUploadService.upload(file, fileData);
@@ -106,68 +136,20 @@ public class BoardController {
 					request.setAttribute("error", "파일 업로드 수량을 초과하였습니다.");
 					return "board/add";
 				}
-			} catch (Exception e) {
-				
+			} catch(Exception e) {
+				request.setAttribute("error", "파일 업로드 작업중 예상치 못한 에러가 발생하였습니다.");
+				return "board/add";
 			}
 			
 		}
 		
 		if(id != -1) {
-			return "redirect:/board/detail?id=" + id;
+			return "redirect:/board/detail?id=" + id;			
 		} else {
+			request.setAttribute("error", "게시글 저장 실패!");
 			return "board/add";
 		}
-		
 	}
-	
-	@GetMapping("/detail")
-	public String getDetail(HttpSession session, Model model, @RequestParam(value="id") int id, @RequestParam(value="page", defaultValue = "1") String page) {
-		logger.info("getDetail(id={})", id);
-		
-		BoardDTO data = service.getData(id);
-
-		if(data != null) {
-			service.incViewCnt(session, data);
-			EmpDTO empData = empService.getId("" + data.getEmpId());
-		
-			List commentDatas = commentService.getDatas(data.getId());
-		
-			page = page == null ? "1" : page;
-		
-			Paging commentPage = new Paging(commentDatas, Integer.parseInt(page), 5);
-		
-			model.addAttribute("data", data);
-			model.addAttribute("empData", empData);
-			model.addAttribute("commentPage", commentPage);
-			return "board/detail";
-		} else {
-			model.addAttribute("error", "해당 데이터가 존재하지 않습니다.");
-			return "error/notExists";
-		}
-	}
-	
-	@PostMapping(value="/like" , produces="application/json; charset=utf-8")
-	@ResponseBody
-	public String getLike(HttpSession session, @SessionAttribute("loginData") EmpDTO empDto,
-			@RequestParam int id) {
-		logger.info("getLike(empDto={}, id={})", empDto, id);
-		
-		BoardDTO data = service.getData(id);
-		
-		JSONObject json = new JSONObject();
-		
-		if(data != null) {
-			service.incLike(session, data);
-			json.put("like", data.getLike());
-			json.put("code", "success");
-		} else {
-			json.put("code", "noData");
-			json.put("message", "해당 데이터가 존재하지 않습니다.");
-		}
-		
-		return json.toJSONString();
-	}
-	
 	
 	@GetMapping(value="/modify")
 	public String modify(Model model
@@ -219,9 +201,9 @@ public class BoardController {
 	}
 	
 	@PostMapping(value="/delete", produces="application/json; charset=utf-8")
-	@ResponseBody // 원래는 return에 들어가는 정보가 jsp인데 이걸 적어야 body부로 들어간다.
-	public String delete(@SessionAttribute("loginData") EmpDTO empDto,
-			@RequestParam int id) {
+	@ResponseBody
+	public String delete(@SessionAttribute("loginData") EmpDTO empDto
+			, @RequestParam int id) {
 		logger.info("delete(empDto={}, id={})", empDto, id);
 		
 		BoardDTO data = service.getData(id);
@@ -231,27 +213,47 @@ public class BoardController {
 		if(data == null) {
 			// 삭제할 데이터 없음
 			json.put("code", "notExists");
-			json.put("message", "이미 삭제된 데이터 입니다.");
+			json.put("message", "이미 삭제 된 데이터 입니다.");
 		} else {
 			if(data.getEmpId() == empDto.getEmpId()) {
-				// 글의 직원 아이디와 삭제하려는 사람의 직원 아이디 동일 하니까 삭제
+				// 작성자, 수정자 동일인
 				boolean result = service.remove(data);
 				if(result) {
-					// 삭제 완료
 					json.put("code", "success");
 					json.put("message", "삭제가 완료되었습니다.");
 				} else {
 					// 삭제 실패
 					json.put("code", "fail");
-					json.put("message", "삭제에 실패 하였습니다.");
+					json.put("message", "삭제 작업 중 문제가 발생하였습니다.");
 				}
 			} else {
-				// 동일하지 않으므로 삭제 x - 권한이 없다.
+				// 작성자, 수정자 동일인 아님 - 권한 없음
 				json.put("code", "permissionError");
-				json.put("message", "삭제할 권한이 없습니다.");
+				json.put("message", "삭제 할 권한이 없습니다.");
 			}
 		}
 		
+		return json.toJSONString();
+	}
+	
+	@PostMapping(value="/like", produces="application/json; charset=utf-8")
+	@ResponseBody
+	public String like(HttpSession session
+			, @RequestParam int id) {
+		logger.info("like(id={})", id);
+		
+		BoardDTO data = service.getData(id);
+		JSONObject json = new JSONObject();
+		
+		if(data == null) {
+			// 존재하지 않음.
+			json.put("code", "noData");
+			json.put("message", "해당 데이터가 존재하지 않습니다.");
+		} else {
+			service.incLike(session, data);
+			json.put("code", "success");
+			json.put("like", data.getLike());
+		}
 		return json.toJSONString();
 	}
 	

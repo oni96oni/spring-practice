@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttribute;
@@ -21,6 +22,7 @@ import com.myhome.web.comment.service.CommentService;
 import com.myhome.web.emp.model.EmpDTO;
 
 @Controller
+@RequestMapping("/board")
 public class CommentController {
 	
 	private static final Logger logger = LoggerFactory.getLogger(CommentController.class);

@@ -44,7 +44,7 @@
 		for(file of files) {
 			if(file.size / 1000 / 1000 > 5.0) {
 				title.innerText = "파일 업로드 오류";
-				body.innerText = "파일 하나당 최대 5MB 까지만 업로드 할 수 있다.";
+				body.innerText = "파일당 최대 5MB 까지만 업로드 할 수 있습니다. 5MB 초과 용량에 대해서는 관리자에게 문의하세요.";
 				modal.show();
 				element.value = "";
 				return;
@@ -65,7 +65,7 @@
 					<textarea class="form-control" name="content" rows="8"
 						placeholder="내용을 입력하세요."></textarea>
 				</div>
-				<div>
+				<div class="mb-3">
 					<input class="form-control" type="file" onchange="uploadCheck(this);" name="fileUpload" multiple>
 				</div>
 				<div class="mb-3 text-end">

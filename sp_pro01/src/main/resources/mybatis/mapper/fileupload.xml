@@ -3,16 +3,22 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
   
 <mapper namespace="fileUploadMapper">
-
 	<select id="getCount" resultType="_int">
 		SELECT COUNT(*) FROM FILEUPLOAD
 		 WHERE BID = #{bId}
 	</select>
-
+	
 	<insert id="insertData" parameterType="fileUploadDto">
-		INSERT INTO FILEUPLOAD 
-		VALUES (FILEUPLOAD_SEQ.NEXTVAL, #{bId}
-			 , #{fileName}, #{location}, #{url}
-			 , #{fileSize}, #{contentType})
+		INSERT INTO FILEUPLOAD
+		     VALUES(FILEUPLOAD_SEQ.NEXTVAL, #{bId}
+		          , #{fileName}, #{uuidName}
+		          , #{location}, #{url}
+		          , #{fileSize}, #{contentType})
 	</insert>
+	
+	<select id="selectDatas" resultType="fileUploadDto">
+		SELECT *
+		  FROM FILEUPLOAD
+		 WHERE BID = #{bId}
+	</select>
 </mapper>

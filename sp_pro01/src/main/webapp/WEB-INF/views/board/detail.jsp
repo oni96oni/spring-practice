@@ -32,6 +32,16 @@
 					<label id="id_like" class="text-secondary text-opacity-75">${data.like}</label>
 				</div>
 			</div>
+			<div class="row mb-1">
+				<ul class="col-4 ms-auto list-group">
+				<c:forEach items="${fileDatas}" var="file">
+					<c:url var="downUrl" value="${file.url}/${file.uuidName}" />
+					<li class="list-group-item text-truncate">
+						<a class="text-info text-decoration-none" href="${downUrl}" download="${file.fileName}">${file.fileName}</a>
+					</li>
+				</c:forEach>
+				</ul>
+			</div>
 			<div class="mb-1 text-end">
 				<c:url var="boardUrl" value="/board" />
 				<button class="btn btn-primary" type="button" onclick="location.href='${boardUrl}'">목록</button>
@@ -101,7 +111,7 @@
 				</div>
 			</c:forEach>
 			<div class="mb-1">
-				<form action="${pageContext.request.contextPath}/comment/add" method="post">
+				<form action="${boardUrl}/comment/add" method="post">
 					<input type="hidden" name="bid" value="${data.id}">
 					<div class="input-group">
 						<textarea class="form-control" name="content" rows="2"></textarea>
@@ -145,24 +155,6 @@
 			element.setAttribute("onclick", "commentUpdate(this);");
 		}
 		
-		function commentUpdate(element) {
-			var cid = element.parentElement.parentElement.children[0].value;
-			var value = element.parentElement.previousElementSibling.children[0].value;
-			
-			$.ajax({
-				url: "${pageContext.request.contextPath}/comment/modify",
-				type: "post",
-				data: {
-					id: cid,
-					content: value
-				},
-				success: function(data) {
-					element.parentElement.previousElementSibling.children[0].value = data.value
-					changeText(element);
-				}
-			});
-		}
-		
 		function changeText(element) {
 			element.innerText = "수정";
 			var cid = element.parentElement.parentElement.children[0].value;
@@ -179,9 +171,27 @@
 			element.setAttribute("onclick", "changeEdit(this);");
 		}
 		
+		function commentUpdate(element) {
+			var cid = element.parentElement.parentElement.children[0].value;
+			var value = element.parentElement.previousElementSibling.children[0].value;
+			
+			$.ajax({
+				url: "/comment/modify",
+				type: "post",
+				data: {
+					id: cid,
+					content: value
+				},
+				success: function(data) {
+					element.parentElement.previousElementSibling.children[0].value = data.value
+					changeText(element);
+				}
+			});
+		}
+		
 		function commentDelete(element, id) {
 			$.ajax({
-				url: "${pageContext.request.contextPath}/comment/delete",
+				url: "/comment/delete",
 				type: "post",
 				data: {
 					id: id
@@ -230,10 +240,10 @@
 				success: function(data) {
 					if(data.code === "success") {
 						element.innerText = data.like;
-					} else if (data.code === "noData") {
+					} else if(data.code === "noData") {
 						alert(data.message);
-						location.href="${boardUrl}";
-					} 
+						location.href = "${boardUrl}";
+					}
 				}
 			});
 		}

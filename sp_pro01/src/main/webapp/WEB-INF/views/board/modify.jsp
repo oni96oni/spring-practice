@@ -23,6 +23,34 @@
 		}
 		form.submit();
 	}
+	
+	function uploadCheck(element) {
+		var files = element.files;
+		
+		var modal = new bootstrap.Modal(document.getElementById("errorModal"), {
+			keyboard: false
+		});
+		var title = modal._element.querySelector(".modal-title");
+		var body = modal._element.querySelector(".modal-body");
+		
+		if(files.length > 3) {
+			title.innerText = "파일 업로드 오류";
+			body.innerText = "파일 업로드는 최대 3개로 제한되어 있습니다.";
+			modal.show();
+			element.value = "";
+			return;
+		}
+		
+		for(file of files) {
+			if(file.size / 1000 / 1000 > 5.0) {
+				title.innerText = "파일 업로드 오류";
+				body.innerText = "파일당 최대 5MB 까지만 업로드 할 수 있습니다. 5MB 초과 용량에 대해서는 관리자에게 문의하세요.";
+				modal.show();
+				element.value = "";
+				return;
+			}
+		}
+	}
 </script>
 <body>
 	<header></header>
@@ -38,8 +66,19 @@
 					<textarea class="form-control" name="content" rows="8"
 						placeholder="내용을 입력하세요.">${data.content}</textarea>
 				</div>
-				<div>
-					<input class="form-control" type="file" name="fileUpload">
+				<div class="mb-3">
+					<ul class="list-group">
+					<c:forEach items="${fileDatas}" var="file">
+						<c:url var="downUrl" value="${file.url}/${file.uuidName}" />
+						<li class="list-group-item">
+							<button class="btn btn-sm btn-danger">삭제</button>
+							<a class="text-info text-decoration-none" href="${downUrl}" download="${file.fileName}">${file.fileName}</a>
+						</li>
+					</c:forEach>
+					</ul>
+				</div>
+				<div class="mb-3">
+					<input class="form-control" type="file" onchange="uploadCheck(this);" name="fileUpload" multiple>
 				</div>
 				<div class="mb-3 text-end">
 					<button class="btn btn-primary" type="button" onclick="formCheck(this.form);">저장</button>
