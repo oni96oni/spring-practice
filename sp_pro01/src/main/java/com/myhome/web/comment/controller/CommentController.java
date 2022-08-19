@@ -25,14 +25,11 @@ import com.myhome.web.emp.model.EmpDTO;
 @RequestMapping("/board")
 public class CommentController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
-	
 	@Autowired
 	private CommentService service;
 	
 	@PostMapping(value="/comment/add")
 	public void addComment(HttpServletRequest request, HttpServletResponse response, @SessionAttribute("loginData") EmpDTO empDto, @RequestParam int bid, @RequestParam String content) throws IOException {
-		logger.info("addComment(empDto={}, bid={}, content={})", empDto, bid, content);
 		
 		CommentDTO commentData = new CommentDTO();
 		commentData.setbId(bid);

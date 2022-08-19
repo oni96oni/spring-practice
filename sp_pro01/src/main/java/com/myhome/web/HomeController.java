@@ -16,15 +16,11 @@ import com.myhome.web.dept.service.DeptService;
 @Controller
 public class HomeController {
 	
-	private static final Logger logger = LoggerFactory.getLogger(HomeController.class);
-	
 	@Autowired
 	private DeptService deptService;
 	
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String home(Model model) {
-		logger.info("home");
-		
 		List<DeptDTO> deptDatas = deptService.getAll();
 		model.addAttribute("deptDatas", deptDatas);
 		return "index";

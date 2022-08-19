@@ -35,8 +35,6 @@ import com.myhome.web.upload.service.FileUploadService;
 @RequestMapping(value="/board")
 public class BoardController {
 
-	private static final Logger logger = LoggerFactory.getLogger(BoardController.class);
-	
 	@Autowired
 	private BoardService service;
 	
@@ -53,7 +51,6 @@ public class BoardController {
 	public String getList(Model model, HttpSession session
 			, @RequestParam(defaultValue="1", required=false) int page
 			, @RequestParam(defaultValue="0", required=false) int pageCount) {
-		logger.info("getList(page={}, pageCount={})", page, pageCount);
 		
 		List datas = service.getAll();
 		
@@ -79,7 +76,6 @@ public class BoardController {
 			, HttpSession session
 			, @RequestParam int id
 			, @RequestParam(value="page", defaultValue = "1") String page) {
-		logger.info("getDetail(id={})", id);
 		
 		BoardDTO data = service.getData(id);
 		List<FileUploadDTO> fileDatas = fileUploadService.getDatas(id);
@@ -107,7 +103,6 @@ public class BoardController {
 	
 	@GetMapping(value="/add")
 	public String add() {
-		logger.info("add()");
 		return "board/add";
 	}
 	
@@ -116,7 +111,6 @@ public class BoardController {
 			, @SessionAttribute("loginData") EmpDTO empDto
 			, @ModelAttribute BoardVO boardVo
 			, @RequestParam("fileUpload") MultipartFile[] files) {
-		logger.info("add(boardVo={})", boardVo);
 		
 		BoardDTO data = new BoardDTO();
 		data.setTitle(boardVo.getTitle());
@@ -155,7 +149,6 @@ public class BoardController {
 	public String modify(Model model
 			, @SessionAttribute("loginData") EmpDTO empDto
 			, @RequestParam int id) {
-		logger.info("modify(empDto={}, id={})", empDto, id);
 		
 		BoardDTO data = service.getData(id);
 		if(data != null) {
@@ -176,7 +169,6 @@ public class BoardController {
 	public String modify(Model model
 			, @SessionAttribute("loginData") EmpDTO empDto
 			, @ModelAttribute BoardVO boardVo) {
-		logger.info("modify(empDto={}, boardVo={})", empDto, boardVo);
 		
 		BoardDTO data = service.getData(boardVo.getId());
 		
@@ -204,7 +196,6 @@ public class BoardController {
 	@ResponseBody
 	public String delete(@SessionAttribute("loginData") EmpDTO empDto
 			, @RequestParam int id) {
-		logger.info("delete(empDto={}, id={})", empDto, id);
 		
 		BoardDTO data = service.getData(id);
 		
@@ -240,7 +231,6 @@ public class BoardController {
 	@ResponseBody
 	public String like(HttpSession session
 			, @RequestParam int id) {
-		logger.info("like(id={})", id);
 		
 		BoardDTO data = service.getData(id);
 		JSONObject json = new JSONObject();

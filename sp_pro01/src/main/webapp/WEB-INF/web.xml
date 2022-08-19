@@ -30,7 +30,6 @@
 		<url-pattern>/</url-pattern>
 	</servlet-mapping>
 	
-	<!-- 한글변환 시작 -->
 	<filter>
 		<filter-name>EncodingFilter</filter-name>
 		<filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
@@ -39,19 +38,26 @@
 			<param-value>UTF-8</param-value>
 		</init-param>
 		<init-param>
-			<param-name>forceEncoding</param-name> <!-- 기본적으로 요청에 대한것만 인코딩처리를 하는데, forceEncoding은 응답도 인코딩 하겠다는 뜻이다. -->
+			<param-name>forceEncoding</param-name>
 			<param-value>true</param-value>
 		</init-param>
 	</filter>
-	
 	<filter-mapping>
 		<filter-name>EncodingFilter</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
-	<!-- jsp에서 인코딩필터를 만들었던것을 스프링에서는 필터가 내장되어 있어서 web.xml에 작성해주면 된다. 한글 변환 끝 -->
 	
+	<error-page>
+		<exception-type>403</exception-type>
+		<location>/WEB-INF/views/error/permission.jsp</location>
+	</error-page>
+	
+	<!-- error-page>
+		<exception-type>org.springframework.dao.PermissionDeniedDataAccessException</exception-type>
+		<location>/WEB-INF/views/error/permission.jsp</location>
+	</error-page>
 	<error-page>
 		<exception-type>java.lang.RuntimeException</exception-type>
 		<location>/WEB-INF/views/error/RuntimeException.jsp</location>
-	</error-page>
+	</error-page-->
 </web-app>
